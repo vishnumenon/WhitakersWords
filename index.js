@@ -110,10 +110,6 @@ function getDefinition(word) {
 		return (array.map(function(item) {return levenshtein(elem, item)}).sort())[0];
 	}
 
-	function fuzzyExists(elem, array) {
-		return minimumLevenshtein(elem, array) <= .2;
-	}
-
 	function formatResult(entry) {
 		return "<b>" + entry.latin.join() + "</b> " + entry.info + " -- " + entry.english + "<br />"; 
 	}
