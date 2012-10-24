@@ -69,27 +69,29 @@ function getDefinition(word) {
 	var word = word.toString().toLowerCase();
 	var matches = [];
 	var englishRE = new RegExp("(^|\\W)" + word + "($|\\W)");
+	var goodEnglishRE = new RegExp("(^|[;,]) *" + word + " *($|[;,])");
 	for(var i = 0; i < dictionary.words.length; i++) {
 		if (usesStems(word, getStems(dictionary.words[i]))) {
 			matches.push(dictionary.words[i]);
 		}
 	}
-	matches.sort(function(a, b){return sortFunction(word, a, b)});
-	var englishCounter = 0 
+	matches.sort(function(a, b){return latinSortFunction(word, a, b)});
+	var englishMatches = [];
 	for(var i = 0; i < dictionary.words.length; i++) {
 		if (dictionary.words[i].english.search(englishRE) > -1) {
-			if (englishCounter < 2) {
-				matches.unshift(dictionary.words[i]);
-			} else {
-				matches.push(dictionary.words[i]);
-			}
-			englishCounter++;
+				englishMatches.push(dictionary.words[i]);
 		}
 	}
-	return matches.slice(0, 10).map(formatResult).join("<br />");
-	}
+	englishMatches.sort(function(a, b) { return englishSortFunction(goodEnglishRE, a, b)});
 
-	function sortFunction(word, entry1, entry2) {
+	return englishMatches.slice(0, 3).concat(matches).concat(englishMatches.slice(3)).slice(0,12).map(formatResult).join("<br />");
+	}
+	
+	function englishSortFunction(regexp, entry1, entry2) {
+		return entry1.english.search(regexp) * -1;
+	}
+	
+	function latinSortFunction(word, entry1, entry2) {
 		var tempArray1 = entry1.latin.slice(0);
 		tempArray1.push(entry1.english);
 		var tempArray2 = entry2.latin.slice(0);
